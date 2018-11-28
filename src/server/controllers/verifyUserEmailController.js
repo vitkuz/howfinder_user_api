@@ -23,7 +23,7 @@ async function verifyUserEmailController(req,res) {
     const updatedUser = await foundUser.save();
     if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
 
-    response.messages.success.push({ text: "Now you can login" });
+    response.addMessage('success', 'Email was verified! Now you can login');
 
     if (ENV === 'development') {
         response.user = updatedUser;
@@ -31,7 +31,7 @@ async function verifyUserEmailController(req,res) {
         response.user = _.pick(updatedUser, ['_id', 'username', 'email', 'isActive']);
     }
 
-    return res.status(200).json(response);
+    return res.status(200).json(response.logTime());
 
 };
 

@@ -38,7 +38,7 @@ async function registerUserController(req,res) {
 
     // sendEmail('userRegisterEmailTemplate', {user:created});
 
-    response.messages.success.push({ text: "You'ved sucessefuly registrated!" });
+    response.addMessage('success', 'You\'ve successfully registered!');
 
     if (ENV === 'development') {
         response.user = createdUser;
@@ -46,7 +46,7 @@ async function registerUserController(req,res) {
         response.user = _.pick(createdUser, ['_id', 'username', 'email', 'isActive','activationToken'])
     }
 
-    res.status(200).json(response);
+    res.status(200).json(response.logTime());
 };
 
 module.exports = registerUserController;

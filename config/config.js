@@ -21,8 +21,5 @@ const config  = {
 };
 
 const final = Object.assign({}, config.all, config[process.env.NODE_ENV]);
-console.log(`
-APP CONFIG:
------------
-${final}`);
+console.log(final);
 module.exports = final;

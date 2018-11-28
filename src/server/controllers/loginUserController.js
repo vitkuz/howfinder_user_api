@@ -43,7 +43,7 @@ async function loginUserController(req,res) {
         response.user = _.pick(foundUser, ['_id','username','email','limits']);
     }
 
-    res.status(200).json(response);
+    res.status(200).json(response.logTime());
 };
 
 module.exports = loginUserController;

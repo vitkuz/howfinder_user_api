@@ -65,9 +65,9 @@ async function updateUserController(req,res) {
 
         if (foundUser.password === hashedPassword) {
             updated.password = await hashUserPassword(newPassword);
-            response.messages.success.push({ text: "Password has been changed!" })
+            response.addMessage('success', 'Password has been changed!');
         } else {
-            response.messages.error.push({ text: "Password hasn't been changed!" })
+            response.addMessage('error', 'Password hasn\'t been changed!');
         }
     }
 
@@ -76,7 +76,7 @@ async function updateUserController(req,res) {
     let updatedUser = await foundUser.save();
     if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
 
-    response.messages.success.push({ text: "User has been saved!" });
+    response.addMessage('success', 'User has been saved!');
 
     if (ENV === 'development') {
         response.user = updatedUser;
@@ -84,7 +84,7 @@ async function updateUserController(req,res) {
         response.user = _.pick(updatedUser, ['_id', 'username', 'email', 'isActive']);
     }
 
-    res.json(response);
+    res.json(response.logTime());
 }
 
 module.exports = updateUserController;

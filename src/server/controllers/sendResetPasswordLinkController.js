@@ -26,7 +26,8 @@ async function sendResetPasswordLink(req,res) {
     if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
 
     // sendEmail('userResetPasswordTemplate', {user:found});
-    response.messages.success.push({ text: 'We\'ve send you a letter with rest link' });
+
+    response.addMessage('success', 'We\'ve send you a letter with rest link');
 
     if (ENV === 'development') {
         response.user = updatedUser;
@@ -34,7 +35,7 @@ async function sendResetPasswordLink(req,res) {
         response.user = _.pick(updatedUser, ['_id', 'username', 'email', 'isActive', 'resetPasswordToken']);
     }
 
-    return res.status(200).json(response);
+    return res.status(200).json(response.logTime());
 
 };
 
