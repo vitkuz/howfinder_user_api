@@ -1,4 +1,4 @@
-async function error500(err, req, res, next) {
+function error500(err, req, res, next) {
     res.status(500).json({
         error: '500 Error error'
     });
