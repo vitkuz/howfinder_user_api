@@ -10,11 +10,21 @@ async function updateUserController(req,res) {
     const response = buildResponseObject(req,res);
 
     const id = req.params.id = req.sanitize(req.params.id);
+
+    let foundUser = await User.findById(id);
+    if (!foundUser) {
+        return res.status(400).json({error: 'User not found'});
+    }
+
     const username = req.body.username = req.sanitize(req.body.username);
+    foundUser.username = username || foundUser.username;
+
     const email = req.body.email = req.sanitize(req.body.email);
 
+
     if (email) {
-        response.messages.error.push({text:'You can\'t update email'})
+        // foundUser.email = email || foundUser.email;
+        response.addMessage('warning', 'You can\'t update email. Create new account')
     }
 
     let firstname, lastname, website, vk, google,
@@ -32,31 +42,28 @@ async function updateUserController(req,res) {
         twitter = req.body.profile.twitter = req.sanitize(req.body.profile.twitter);
         youtube = req.body.profile.youtube = req.sanitize(req.body.profile.youtube);
         instagram = req.body.profile.instagram = req.sanitize(req.body.profile.instagram);
+
+
+        foundUser.profile = foundUser.profile || {};
+
+        foundUser.profile.firstname = firstname || foundUser.profile.firstname;
+        foundUser.profile.lastname = lastname || foundUser.profile.lastname;
+        foundUser.profile.website = lastname || foundUser.profile.website;
+
+        foundUser.profile.vk = vk || foundUser.profile.vk;
+        foundUser.profile.facebook = facebook || foundUser.profile.facebook;
+        foundUser.profile.google = google || foundUser.profile.google;
+        foundUser.profile.odnoklassniki = odnoklassniki || foundUser.profile.odnoklassniki;
+        foundUser.profile.twitter = twitter || foundUser.profile.twitter;
+        foundUser.profile.youtube = youtube || foundUser.profile.youtube;
+        foundUser.profile.instagram = instagram || foundUser.profile.instagram;
     }
+
 
 
     // const password2 = req.body.password2 = req.sanitize(req.body.password2);
 
-    const updated = {
-        username,
-        profile: {
-            firstname,
-            lastname,
-            website,
-            vk,
-            google,
-            facebook,
-            odnoklassniki,
-            twitter,
-            youtube,
-            instagram
-        }
-    };
 
-    let foundUser = await User.findById(id);
-    if (!foundUser) {
-        return res.status(400).json({error: 'User not found'});
-    }
 
     const password = req.body.password = req.sanitize(req.body.password);
     const newPassword = req.body.newPassword = req.sanitize(req.body.newPassword);
@@ -64,14 +71,12 @@ async function updateUserController(req,res) {
         const hashedPassword = await hashUserPassword(password);
 
         if (foundUser.password === hashedPassword) {
-            updated.password = await hashUserPassword(newPassword);
+            foundUser.password = await hashUserPassword(newPassword);
             response.addMessage('success', 'Password has been changed!');
         } else {
             response.addMessage('error', 'Password hasn\'t been changed!');
         }
     }
-
-    foundUser.set(updated);
 
     let updatedUser = await foundUser.save();
     if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
