@@ -48,7 +48,7 @@ async function updateUserController(req,res) {
 
         foundUser.profile.firstname = firstname || foundUser.profile.firstname;
         foundUser.profile.lastname = lastname || foundUser.profile.lastname;
-        foundUser.profile.website = lastname || foundUser.profile.website;
+        foundUser.profile.website = website || foundUser.profile.website;
 
         foundUser.profile.vk = vk || foundUser.profile.vk;
         foundUser.profile.facebook = facebook || foundUser.profile.facebook;
