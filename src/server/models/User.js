@@ -4,7 +4,7 @@ const uuid = require('uuid/v1');
 const Joi = require('joi');
 
 
-const { JWT_SECRET } = require('../../../config/config');
+const {JWT_SECRET} = require('../../../config/config');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -31,13 +31,18 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
     activationToken: {
-        type:String
+        type: String
     },
     resetPasswordToken: {
-        type:String
-    },
-    bio: {
         type: String
+    },
+    tokens: {
+        activationToken: {
+            type: String
+        },
+        resetPasswordToken: {
+            type: String
+        },
     },
     profile: {
         firstname: {
@@ -75,18 +80,15 @@ const UserSchema = new mongoose.Schema({
         },
         website: {
             type: String
+        },
+        bio: {
+            type: String
         }
     },
     following: {
-        users: {
-
-        },
-        questions: {
-
-        },
-        topics: {
-            
-        }
+        users: {},
+        questions: {},
+        topics: {}
     },
     settings: {
         language: {
@@ -94,8 +96,7 @@ const UserSchema = new mongoose.Schema({
             default: 'ru'
         }
     },
-    stats: {
-    },
+    stats: {},
     limits: {
         pageViewsInSession: {
             type: Number,
@@ -107,22 +108,20 @@ const UserSchema = new mongoose.Schema({
     //         date: Date
     //     }
     // ],
-    followed: {
-
-    },
-    roles:[{
-        type:String,
+    followed: {},
+    roles: [{
+        type: String,
         default: 'member'
     }],
     points: {
         type: Number
     },
-    activated: {  type: Date },
-    created: {  type: Date, default: Date.now},
-    updated: {  type: Date, default: Date.now}
+    activated: {type: Date},
+    created: {type: Date, default: Date.now},
+    updated: {type: Date, default: Date.now}
 });
 
-UserSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function (next) {
     var user = this;
 
     if (user.uuid === '' || !user.uuid) {
@@ -135,11 +134,11 @@ UserSchema.pre("save", async function(next) {
 });
 
 UserSchema.methods.generateToken = function () {
-    const token = jwt.sign({_id: this._id, username:this.username, roles: this.roles}, JWT_SECRET);
+    const token = jwt.sign({_id: this._id, username: this.username, roles: this.roles}, JWT_SECRET);
     return token;
 };
 
-UserSchema.statics.validatePasswordChangeRequest = function(requestBody) {
+UserSchema.statics.validatePasswordChangeRequest = function (requestBody) {
     const schema = Joi.object({
         resetPasswordToken: Joi
             .string()
@@ -153,14 +152,14 @@ UserSchema.statics.validatePasswordChangeRequest = function(requestBody) {
     return Joi.validate(requestBody, schema); // {error, value}
 };
 
-UserSchema.statics.validateSendPasswordLinkRequest = function(requestBody) {
+UserSchema.statics.validateSendPasswordLinkRequest = function (requestBody) {
     const schema = Joi.object({
-        email: Joi.string().email({ minDomainAtoms: 2 }).required()
+        email: Joi.string().email({minDomainAtoms: 2}).required()
     });
     return Joi.validate(requestBody, schema); // {error, value}
 };
 
-UserSchema.statics.validateActivationRequest = function(requestBody) {
+UserSchema.statics.validateActivationRequest = function (requestBody) {
     const schema = Joi.object({
         activationToken: Joi.string().required()
     });
@@ -180,7 +179,7 @@ UserSchema.statics.validateRegistrationRequest = function (requestBody) {
             .string()
             .regex(/^[a-zA-Z0-9]{3,30}$/)
             .required(),
-        email: Joi.string().email({ minDomainAtoms: 2 }).required()
+        email: Joi.string().email({minDomainAtoms: 2}).required()
     });
 
     return Joi.validate(requestBody, schema); // {error, value}

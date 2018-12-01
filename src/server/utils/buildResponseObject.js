@@ -1,6 +1,7 @@
 module.exports = (req,res) => {
     return {
         meta: {
+            lang: req.locale,
             date: Date.now(),
             type: 'success',
             code: null,

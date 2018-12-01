@@ -9,6 +9,8 @@ const compression = require('compression');
 const responseTime = require('response-time');
 const express = require('express');
 
+const setLocele = require('../middlewares/setLocale')
+
 const { ENV, PORT, MONGO_URI, EXPRESS_SESSION_SECRET } = require('../../../config/config');
 
 module.exports = function (app) {
@@ -33,13 +35,8 @@ module.exports = function (app) {
     // Mount express-sanitizer here
 
     app.use(cookieParser());
+    app.use(setLocele);
 
-    // app.use(session({
-    //     secret: EXPRESS_SESSION_SECRET,
-    //     resave: false,
-    //     saveUninitialized: true,
-    //     store: new MongoStore({ url: MONGO_URI })
-    // }));
 
     app.use(expressSanitizer());
 

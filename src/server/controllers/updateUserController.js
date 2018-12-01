@@ -5,15 +5,17 @@ const { ENV } = require('../../../config/config');
 
 const hashUserPassword = require('../utils/hashUserPassword');
 const buildResponseObject = require('../utils/buildResponseObject');
+const appLocalization = require('../../../config/localization');
 
 async function updateUserController(req,res) {
+    appLocalization.setLocale(req.locale);
     const response = buildResponseObject(req,res);
 
     const id = req.params.id = req.sanitize(req.params.id);
 
     let foundUser = await User.findById(id);
     if (!foundUser) {
-        return res.status(400).json({error: 'User not found'});
+        return res.status(400).json({error: req.localization.translate('User not found')});
     }
 
     const username = req.body.username = req.sanitize(req.body.username);
@@ -24,7 +26,7 @@ async function updateUserController(req,res) {
 
     if (email) {
         // foundUser.email = email || foundUser.email;
-        response.addMessage('warning', 'You can\'t update email. Create new account')
+        response.addMessage('warning', req.localization.translate('You can\'t update email. Create new account'))
     }
 
     let firstname, lastname, website, vk, google,
@@ -72,16 +74,16 @@ async function updateUserController(req,res) {
 
         if (foundUser.password === hashedPassword) {
             foundUser.password = await hashUserPassword(newPassword);
-            response.addMessage('success', 'Password has been changed!');
+            response.addMessage('success', req.localization.translate('Password has been changed'));
         } else {
-            response.addMessage('error', 'Password hasn\'t been changed!');
+            response.addMessage('error', req.localization.translate('Password hasn\'t been changed'));
         }
     }
 
     let updatedUser = await foundUser.save();
-    if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
+    if (!updatedUser) return res.status(400).json({error: req.localization.translate('Error saving user')});
 
-    response.addMessage('success', 'User has been saved!');
+    response.addMessage('success', req.localization.translate('User has been updated and save'));
 
     if (ENV === 'development') {
         response.user = updatedUser;

@@ -2,32 +2,41 @@ const User = require('../models/User');
 const uuid = require('uuid/v1');
 const _ = require('lodash');
 
-const { ENV } = require('../../../config/config');
+const {ENV, EMAIL_ADMIN} = require('../../../config/config');
+
 const buildResponseObject = require('../utils/buildResponseObject');
+const sendMail = require('../services/sendgrid/sendMail');
 
-// const sendEmail = require('../../services/sendmail/sendMail');
-
-async function sendResetPasswordLink(req,res) {
-    const response = buildResponseObject(req,res);
+async function sendResetPasswordLink(req, res) {
+    const response = buildResponseObject(req, res);
 
     const email = req.body.email = req.sanitize(req.body.email);
 
-    let { error } = User.validateSendPasswordLinkRequest(req.body);
+    let {error} = User.validateSendPasswordLinkRequest(req.body);
     if (error) return res.status(400).json({error: error.message});
 
     let foundUser = await User.findOne({email});
-    if (!foundUser) return res.status(400).json({error: 'There is no user with this email'});
+    if (!foundUser) return res.status(400).json({error: req.localization.translate('There is no user with this email')});
 
     foundUser.set({
         resetPasswordToken: uuid(),
     });
 
     const updatedUser = await foundUser.save();
-    if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
+    if (!updatedUser) return res.status(400).json({error: req.localization.translate('Error saving user')});
 
-    // sendEmail('userResetPasswordTemplate', {user:found});
+    try {
+        sendMail({
+            key: 'userResetPasswordTemplate',
+            to: updatedUser.email,
+            from: EMAIL_ADMIN,
+            context: {user: updatedUser}
+        });
+    } catch (e) {
+        console.log(e);
+    }
 
-    response.addMessage('success', 'We\'ve send you a letter with rest link');
+    response.addMessage('success', req.localization.translate('We\'ve sent you a letter with reset link'));
 
     if (ENV === 'development') {
         response.user = updatedUser;

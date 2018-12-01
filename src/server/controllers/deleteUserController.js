@@ -11,10 +11,10 @@ async function deleteUserController(req,res) {
 
     const deletedUser = await User.findOneAndDelete({_id: id});
     if (!deletedUser) {
-        return res.status(400).json({error: 'User not found'});
+        return res.status(400).json({error: req.localization.translate('User not found')});
     }
 
-    response.addMessage('success', "User was deleted!");
+    response.addMessage('success', req.localization.translate('User was deleted'));
 
     if (ENV === 'development') {
         response.user = deletedUser;

@@ -12,7 +12,7 @@ async function getUserController(req,res) {
 
     let foundUser = await User.findById(id);
     if (!foundUser) {
-        return res.status(400).json({error: 'User not found'});
+        return res.status(400).json({error: req.localization.translate('User not found')});
     }
 
     if (ENV === 'development') {

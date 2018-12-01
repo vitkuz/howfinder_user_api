@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+
 const { ENV } = require('../../../config/config');
 
 const buildResponseObject = require('../utils/buildResponseObject');
@@ -17,17 +18,17 @@ async function loginUserController(req,res) {
 
     let foundUser = await User.findOne({email});
     if (!foundUser) {
-        return res.status(400).json({error: 'Incorrect username or password'});
+        return res.status(400).json({error: req.localization.translate('Incorrect username or password')});
     }
 
 
     const passwordsIsEqual = await bcrypt.compare(password, foundUser.password);
     if (!passwordsIsEqual) {
-        return res.status(400).json({error: 'Incorrect username or password'});
+        return res.status(400).json({error: req.localization.translate('Incorrect username or password')});
     }
 
     if (!foundUser.isActive) {
-        return res.status(400).json({error: 'User is not active. Please verify your email'})
+        return res.status(400).json({error: req.localization.translate('User is not active. Please verify your email')})
     };
 
     const jwtToken = foundUser.generateToken();
@@ -35,7 +36,7 @@ async function loginUserController(req,res) {
     res.header('x-auth', jwtToken);
     res.cookie('_jwt',jwtToken, { maxAge: 900000, httpOnly: true });
 
-    response.messages.success.push({text:'You have successfully login'})
+    response.addMessage('success', req.localization.translate('You have successfully login'));
 
     if (ENV === 'development') {
         response.user = foundUser;

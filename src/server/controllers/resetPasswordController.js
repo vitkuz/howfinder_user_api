@@ -20,7 +20,7 @@ async function resetPasswordController(req,res) {
     const hashedPassword = await hashUserPassword(password);
 
     const foundUser = await User.findOne({resetPasswordToken});
-    if (!foundUser) return res.status(400).json({error: 'User with this token not found'});
+    if (!foundUser) return res.status(400).json({error: req.localization.translate('User with this token not found')});
 
     foundUser.set({
         resetPasswordToken: '',
@@ -29,9 +29,9 @@ async function resetPasswordController(req,res) {
     });
 
     const updatedUser = await foundUser.save();
-    if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
+    if (!updatedUser) return res.status(400).json({error: req.localization.translate('Error saving user')});
 
-    response.addMessage('success', 'your password was successfully reset');
+    response.addMessage('success', req.localization.translate('Your password was successfully changed'));
 
     if (ENV === 'development') {
         response.user = updatedUser;
@@ -40,8 +40,6 @@ async function resetPasswordController(req,res) {
     }
 
     return res.status(200).json(response.logTime());
-
-
 };
 
 module.exports = resetPasswordController;

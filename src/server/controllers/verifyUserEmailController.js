@@ -12,7 +12,7 @@ async function verifyUserEmailController(req,res) {
     if (!activationToken) return res.status(400).json({error: 'Provide token'});
 
     const foundUser = await User.findOne({activationToken});
-    if (!foundUser) return res.status(400).json({error: 'User with this token not found'});
+    if (!foundUser) return res.status(400).json({error: req.localization.translate('User with this token not found')});
 
     foundUser.set({
         activated: Date.now(),
@@ -21,9 +21,9 @@ async function verifyUserEmailController(req,res) {
     });
 
     const updatedUser = await foundUser.save();
-    if (!updatedUser) return res.status(400).json({error: 'Error saving user'});
+    if (!updatedUser) return res.status(400).json({error: req.localization.translate('Error saving user')});
 
-    response.addMessage('success', 'Email was verified! Now you can login');
+    response.addMessage('success', req.localization.translate('Email was verified. Now you can login'));
 
     if (ENV === 'development') {
         response.user = updatedUser;
