@@ -9,6 +9,8 @@ async function resetPasswordController(req,res) {
     const response = buildResponseObject(req,res);
 
     const resetPasswordToken = req.body.resetPasswordToken = req.sanitize(req.body.resetPasswordToken);
+    if (!resetPasswordToken) return res.status(400).json({error: req.localization.translate('Provide token')});
+
     const password = req.body.password = req.sanitize(req.body.password);
 
     let { error } = User.validatePasswordChangeRequest({
@@ -19,11 +21,13 @@ async function resetPasswordController(req,res) {
 
     const hashedPassword = await hashUserPassword(password);
 
-    const foundUser = await User.findOne({resetPasswordToken});
+    const foundUser = await User.findOne({'tokens.resetPasswordToken':resetPasswordToken});
     if (!foundUser) return res.status(400).json({error: req.localization.translate('User with this token not found')});
 
     foundUser.set({
-        resetPasswordToken: '',
+        tokens: {
+            resetPasswordToken: '',
+        },
         password: hashedPassword,
         isActive: true
     });

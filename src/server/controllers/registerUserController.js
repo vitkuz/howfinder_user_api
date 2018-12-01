@@ -23,13 +23,16 @@ async function registerUserController(req, res) {
     if (foundUser) return res.status(400).json({error: req.localization.translate('User with this username already exists')});
 
     const hashedPassword = await hashUserPassword(password);
+    const token = uuid();
     const user = new User({
         username,
         email,
         roles: ['member'],
-        isActive: VERIFY_USERS ? false : true,
+        isActive: !VERIFY_USERS,
         password: hashedPassword,
-        activationToken: uuid()
+        tokens: {
+            activationToken: token
+        }
     });
 
     const createdUser = await user.save();

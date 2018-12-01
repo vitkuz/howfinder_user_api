@@ -9,14 +9,16 @@ async function verifyUserEmailController(req,res) {
 
     //1 Check user exists, if exist send error
     const activationToken = req.body.activationToken = req.sanitize(req.body.activationToken);
-    if (!activationToken) return res.status(400).json({error: 'Provide token'});
+    if (!activationToken) return res.status(400).json({error: req.localization.translate('Provide token')});
 
-    const foundUser = await User.findOne({activationToken});
+    const foundUser = await User.findOne({'tokens.activationToken':activationToken});
     if (!foundUser) return res.status(400).json({error: req.localization.translate('User with this token not found')});
 
     foundUser.set({
         activated: Date.now(),
-        activationToken: '',
+        tokens: {
+            activationToken: '',
+        },
         isActive: true
     });
 

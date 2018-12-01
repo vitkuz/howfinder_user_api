@@ -51,6 +51,9 @@ const myLocalize = new Localize({
     },
     'Email was verified. Now you can login': {
         'ru': 'Электронная почта была подтверждена. Теперь вы можете войти на сайт'
+    },
+    'Provide token': {
+        'ru': 'Укажите токен'
     }
 });
 

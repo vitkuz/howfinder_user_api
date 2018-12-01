@@ -18,8 +18,12 @@ async function sendResetPasswordLink(req, res) {
     let foundUser = await User.findOne({email});
     if (!foundUser) return res.status(400).json({error: req.localization.translate('There is no user with this email')});
 
+    const token = uuid();
+
     foundUser.set({
-        resetPasswordToken: uuid(),
+        tokens: {
+            resetPasswordToken: token,
+        }
     });
 
     const updatedUser = await foundUser.save();

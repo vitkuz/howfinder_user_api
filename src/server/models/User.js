@@ -30,10 +30,10 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    activationToken: {
+    activationToken: { //depricated
         type: String
     },
-    resetPasswordToken: {
+    resetPasswordToken: { //depricated
         type: String
     },
     tokens: {
